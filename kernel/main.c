@@ -3,6 +3,10 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "scheduler.h"
+#include "SJF.h"
+#include "CFS.h"
+#include "DRR.h"
 
 volatile static int started = 0;
 
@@ -28,6 +32,8 @@ main()
     iinit();         // inode table
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
+    currentSchedulingStrategy=DRRscheduler; //set default scheduler
+    currentSchedulingStrategy.initialize(); //initialize default scheduler
     userinit();      // first user process
     __sync_synchronize();
     started = 1;

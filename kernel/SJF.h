@@ -1,1 +1,1 @@
-extern struct scheduler SJFscheduler;
+extern struct schedulingStrategy SJFscheduler;

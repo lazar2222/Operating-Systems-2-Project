@@ -13,14 +13,24 @@ void initializeSJF()
     panic("SJF");
 }
 
+void perCoreInitializeSJF(int core)
+{
+
+}
+
 int getSJF()
 {
     return 0;
 }
 
-void putSJF(int processIndex)
+void putSJF(int processIndex,int reason)
 {
 
 }
 
-struct scheduler SJFscheduler={initializeSJF,getSJF, putSJF};
+void timerSJF(int user)
+{
+
+}
+
+struct schedulingStrategy SJFscheduler={initializeSJF,perCoreInitializeSJF,getSJF, putSJF,timerSJF};

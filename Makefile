@@ -31,7 +31,9 @@ OBJS = \
   $K/virtio_disk.o\
   $K/heap.o\
   $K/SJF.o\
-  $K/CFS.o
+  $K/CFS.o\
+  $K/DRR.o\
+  $K/scheduler.o
 
 # riscv64-unknown-elf- or riscv64-linux-gnu-
 # perhaps in /opt/riscv/bin

@@ -1,1 +1,1 @@
-extern struct scheduler CFSscheduler;
+extern struct schedulingStrategy CFSscheduler;

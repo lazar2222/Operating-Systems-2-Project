@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "scheduler.h"
 
 struct spinlock tickslock;
 uint ticks;
@@ -78,7 +79,7 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
-    yield();
+    currentSchedulingStrategy.timer(TIMER_SOURCE_USER);
 
   usertrapret();
 }
@@ -151,7 +152,7 @@ kerneltrap()
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
-    yield();
+    currentSchedulingStrategy.timer(TIMER_SOURCE_KERNEL);
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
@@ -177,7 +178,6 @@ int
 devintr()
 {
   uint64 scause = r_scause();
-
   if((scause & 0x8000000000000000L) &&
      (scause & 0xff) == 9){
     // this is a supervisor external interrupt, via PLIC.

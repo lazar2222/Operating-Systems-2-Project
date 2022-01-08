@@ -13,14 +13,24 @@ void initializeCFS()
     panic("CFS");
 }
 
+void perCoreInitializeCFS(int core)
+{
+
+}
+
 int getCFS()
 {
     return 0;
 }
 
-void putCFS(int processIndex)
+void putCFS(int processIndex,int reason)
 {
 
 }
 
-struct scheduler CFSscheduler={initializeCFS,getCFS, putCFS};
+void timerCFS(int user)
+{
+
+}
+
+struct schedulingStrategy CFSscheduler={initializeCFS,perCoreInitializeCFS,getCFS, putCFS,timerCFS};
