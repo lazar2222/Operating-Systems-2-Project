@@ -105,4 +105,10 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  //scheduling data
+  int priority;                // Processes with the lowest priority are selected first
+  int timeslice;               // Amount of time process runs before its rescheduled (0 for infinite)
 };
+
+extern struct proc proc[NPROC];
