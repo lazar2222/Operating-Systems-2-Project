@@ -11,7 +11,7 @@ int heap[NPROC+1]={0};
 
 void heapInsert(int procIndex)
 {
-    if(heap[0]==NPROC){return;}
+    if(heap[0]==NPROC){ panic("scheduler heap full");}
     heap[++heap[0]]=procIndex;
     int i=heap[0];
     int tmp;
@@ -38,8 +38,8 @@ int min(int a,int b)
 
 void heapRemove(int heapIndex)
 {
-    if(heap[0]==0){return;}
-    if(heapIndex<1 || heapIndex>heap[0]){return;}
+    if(heap[0]==0){ panic("removal from empty heap");}
+    if(heapIndex<1 || heapIndex>heap[0]){ panic("invalid heap index");}
     int tmp;
     heap[heapIndex]=heap[heap[0]];
     while(heapIndex>1)
@@ -95,6 +95,7 @@ void heapRemove(int heapIndex)
 
 void heapify()
 {
+    //TODO: LOCK
     int size=heap[0];
     if(size<2){return;}
     heap[0]=1;

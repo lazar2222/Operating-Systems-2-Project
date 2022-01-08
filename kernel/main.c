@@ -2,6 +2,8 @@
 #include "param.h"
 #include "memlayout.h"
 #include "riscv.h"
+#include "spinlock.h"
+#include "proc.h"
 #include "defs.h"
 #include "scheduler.h"
 #include "SJF.h"
@@ -32,7 +34,7 @@ main()
     iinit();         // inode table
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
-    currentSchedulingStrategy=DRRscheduler; //set default scheduler
+    currentSchedulingStrategy=SJFscheduler; //set default scheduler
     currentSchedulingStrategy.initialize(); //initialize default scheduler
     userinit();      // first user process
     __sync_synchronize();
@@ -47,5 +49,8 @@ main()
     plicinithart();   // ask PLIC for device interrupts
   }
 
+  acquire(&numCpus_lock);
+  numCpus++;
+  release(&numCpus_lock);
   scheduler();        
 }

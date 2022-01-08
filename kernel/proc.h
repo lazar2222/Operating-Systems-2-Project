@@ -109,6 +109,20 @@ struct proc {
   //scheduling data
   int priority;                // Processes with the lowest priority are selected first
   int timeslice;               // Amount of time process runs before its rescheduled (0 for infinite)
+  int executiontime;           // Amount of time process has been running without going into SLEEPING state
+  int schedtmp;                 // Additional field used by schedulers
+
+  //core affinity data
+  int affinity;                // Index of cpu process has affinity to
+  int affinityAge;             // Last scheduling round when process executed on a affinitized cpu
+  int laziness;                // Number of times process can defer being scheduled on a non affinitized cpu
 };
 
 extern struct proc proc[NPROC];
+
+extern int numProc;
+extern int numCpus;
+extern struct spinlock numCpus_lock;
+
+int getprocnum();
+int getcpunum();

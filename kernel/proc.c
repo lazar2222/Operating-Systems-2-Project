@@ -13,8 +13,11 @@ struct proc proc[NPROC];
 
 struct proc *initproc;
 
+int numProc = 0;
+int numCpus = 0;
 int nextpid = 1;
 struct spinlock pid_lock;
+struct spinlock numCpus_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -51,6 +54,7 @@ procinit(void)
   
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
+  initlock(&numCpus_lock,"numCpus");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->kstack = KSTACK((int) (p - proc));
@@ -93,9 +97,28 @@ allocpid() {
   acquire(&pid_lock);
   pid = nextpid;
   nextpid = nextpid + 1;
+  numProc++;
   release(&pid_lock);
 
   return pid;
+}
+
+int
+getprocnum() {
+  int num;
+  acquire(&pid_lock);
+  num=numProc;
+  release(&pid_lock);
+  return num;
+}
+
+int
+getcpunum() {
+    int num;
+    acquire(&numCpus_lock);
+    num=numCpus;
+    release(&numCpus_lock);
+    return num;
 }
 
 // Look in the process table for an UNUSED proc.
@@ -120,6 +143,13 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->priority=0;
+  p->timeslice=0;
+  p->executiontime=0;
+  p->schedtmp=0;
+  p->affinity=-1;
+  p->affinityAge=0;
+  p->laziness=0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -165,6 +195,9 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  acquire(&pid_lock);
+  numProc--;
+  release(&pid_lock);
 }
 
 // Create a user page table for a given process,
