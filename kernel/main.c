@@ -34,7 +34,7 @@ main()
     iinit();         // inode table
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
-    currentSchedulingStrategy=SJFscheduler; //set default scheduler
+    currentSchedulingStrategy=CFSscheduler; //set default scheduler
     currentSchedulingStrategy.initialize(); //initialize default scheduler
     userinit();      // first user process
     __sync_synchronize();
