@@ -32,7 +32,7 @@ int getCFS()
     wticks=ticks;
     proc[index].timeslice=(wticks-proc[index].schedtmp+(getprocnum()/2))/getprocnum();
     if(proc[index].timeslice==0){proc[index].timeslice=1;}
-    //printf("TS %d\n",proc[index].timeslice);
+    //printf("TS %d %d %d\n",wticks-proc[index].schedtmp,getprocnum(),proc[index].timeslice);
     acquire(&(proc[index].lock));
     proc[index].state = RUNNING;
     return index;
@@ -45,8 +45,8 @@ void putCFS(int processIndex,int reason)
         proc[processIndex].executiontime=0;
     }
     proc[processIndex].priority=proc[processIndex].executiontime;
-    //printf("PUT %d\n",proc[processIndex].priority);
     proc[processIndex].schedtmp = ticks;
+    //printf("PUT %d %d\n",proc[processIndex].priority,proc[processIndex].schedtmp);
     proc[processIndex].state=RUNNABLE;
     acquire(&CFSsched_lock);
     heapInsert(processIndex);
