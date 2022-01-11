@@ -7,6 +7,8 @@
 #define SCHEDULER_SJF_PREEMPRIVE 2
 #define SCHEDULER_SJF_EAGER_PREEMPRIVE 3
 #define SCHEDULER_CFS 4
+#define AFFINITY_ENABLED 1
+#define AFFINITY_DISABLED 0
 
 struct schedulingStrategy{
     void (*initialize)();

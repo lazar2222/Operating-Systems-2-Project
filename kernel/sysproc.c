@@ -95,3 +95,32 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
+uint64
+sys_sched(void)
+{
+    int type;
+    int factor;
+    int timeslice;
+    int ease;
+    argint(0,&type);
+    argint(1,&factor);
+    argint(2,&timeslice);
+    argint(3,&ease);
+    printf("SCHED: %d %d %d %d\n",type,factor,timeslice,ease);
+    return 53729;
+}
+
+uint64
+sys_affinity(void)
+{
+    int enabled;
+    int eager;
+    int age;
+    argint(0,&enabled);
+    argint(1,&eager);
+    argint(2,&age);
+    printf("AFFINITY: %d %d %d\n",enabled,eager,age);
+    return 53730;
+}

@@ -57,6 +57,7 @@ void timerCFS(int user)
 {
     struct proc* p=myproc();
     p->executiontime++;
+    //printf("TIMER\n");
     if(p->timeslice>1)
     {
         p->timeslice--;

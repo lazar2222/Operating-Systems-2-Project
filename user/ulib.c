@@ -85,14 +85,21 @@ stat(const char *n, struct stat *st)
 }
 
 int
-atoi(const char *s)
-{
-  int n;
+atoi(const char *s) {
+    int n;
+    int mul = 1;
 
-  n = 0;
-  while('0' <= *s && *s <= '9')
-    n = n*10 + *s++ - '0';
-  return n;
+    n = -53729;
+    if (*s == '-') {
+        mul = -1;
+        s++;
+    }
+    while ('0' <= *s && *s <= '9')
+    {
+        if(n<0){n=0;}
+        n = n * 10 + *s++ - '0';
+    }
+  return n*mul;
 }
 
 void*

@@ -1,3 +1,5 @@
+#define NOT_AN_INT -53729
+
 struct stat;
 struct rtcdate;
 
@@ -23,6 +25,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int sched(int type,int factor,int timeslice,int ease);
+int affinity(int enabled,int initialLaziness, int maxAge);
 
 // ulib.c
 int stat(const char*, struct stat*);
