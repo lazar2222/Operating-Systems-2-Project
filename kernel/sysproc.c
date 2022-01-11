@@ -109,6 +109,9 @@ sys_sched(void)
     argint(2,&timeslice);
     argint(3,&ease);
     printf("SCHED: %d %d %d %d\n",type,factor,timeslice,ease);
+    push_off();
+
+    pop_off();
     return 53729;
 }
 

@@ -18,4 +18,11 @@ struct schedulingStrategy{
     void (*timer)(int);
 };
 
+void sched_initialize();
+void sched_perCoreInitialize(int core);
+int sched_get();
+void sched_put(int processIndex,int reason);
+void sched_timer(int user);
+
 extern struct schedulingStrategy currentSchedulingStrategy;
+extern struct spinlock sched_lock;

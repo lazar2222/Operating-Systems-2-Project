@@ -35,7 +35,7 @@ main()
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
     currentSchedulingStrategy=CFSscheduler; //set default scheduler
-    currentSchedulingStrategy.initialize(); //initialize default scheduler
+    sched_initialize(); //initialize default scheduler
     userinit();      // first user process
     __sync_synchronize();
     started = 1;

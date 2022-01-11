@@ -79,7 +79,7 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
-    currentSchedulingStrategy.timer(TIMER_SOURCE_USER);
+      sched_timer(TIMER_SOURCE_USER);
 
   usertrapret();
 }
@@ -152,7 +152,7 @@ kerneltrap()
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
-    currentSchedulingStrategy.timer(TIMER_SOURCE_KERNEL);
+      sched_timer(TIMER_SOURCE_KERNEL);
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.

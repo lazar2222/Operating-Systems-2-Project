@@ -9,11 +9,9 @@
 #include "CFS.h"
 #include "heap.h"
 
-struct spinlock CFSsched_lock;
-
 void initializeCFS()
 {
-    initlock(&CFSsched_lock,"CFSlock");
+
 }
 
 void perCoreInitializeCFS(int core)
@@ -24,11 +22,9 @@ void perCoreInitializeCFS(int core)
 int getCFS()
 {
     int wticks;
-    acquire(&CFSsched_lock);
-    if(heap[0]==0){release(&CFSsched_lock); return -1;}
+    if(heap[0]==0){return -1;}
     int index= heap[1];
     heapRemove(1);
-    release(&CFSsched_lock);
     wticks=ticks;
     proc[index].timeslice=(wticks-proc[index].schedtmp+(getprocnum()/2))/getprocnum();
     if(proc[index].timeslice==0){proc[index].timeslice=1;}
@@ -48,9 +44,7 @@ void putCFS(int processIndex,int reason)
     proc[processIndex].schedtmp = ticks;
     //printf("PUT %d %d\n",proc[processIndex].priority,proc[processIndex].schedtmp);
     proc[processIndex].state=RUNNABLE;
-    acquire(&CFSsched_lock);
     heapInsert(processIndex);
-    release(&CFSsched_lock);
 }
 
 void timerCFS(int user)
