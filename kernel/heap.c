@@ -95,11 +95,26 @@ void heapRemove(int heapIndex)
 
 void heapify()
 {
-    //TODO: LOCK
     int size=heap[0];
     if(size<2){return;}
     heap[0]=1;
     for (int i = 2; i <= size; ++i) {
         heapInsert(heap[i]);
     }
+}
+
+void heapClear()
+{
+    heap[0]=0;
+}
+
+int heapMin()
+{
+    if(heap[0]==0){return -1;}
+    return heap[1];
+}
+
+int heapSize()
+{
+    return heap[0];
 }

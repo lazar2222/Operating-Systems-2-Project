@@ -23,6 +23,7 @@ void sched_perCoreInitialize(int core);
 int sched_get();
 void sched_put(int processIndex,int reason);
 void sched_timer(int user);
+int sched_change(int type,int factor,int timeslice,int ease);
+int sched_affinity(int enabled,int initialLaziness, int maxAge);
 
-extern struct schedulingStrategy currentSchedulingStrategy;
 extern struct spinlock sched_lock;

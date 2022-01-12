@@ -22,12 +22,13 @@ void perCoreInitializeDRR(int core)
 int getDRR()
 {
     for(; p < &proc[NPROC]; p++) {
-        acquire(&p->lock);
+
         if(p->state == RUNNABLE) {
+            acquire(&p->lock);
             p->state = RUNNING;
+            //printf("getDRR\n");
             return (p++)-proc;
         }
-        release(&p->lock);
     }
     p=proc;
     return -1;
@@ -35,11 +36,13 @@ int getDRR()
 
 void putDRR(int processIndex,int reason)
 {
+    //printf("putDRR\n");
     proc[processIndex].state = RUNNABLE;
 }
 
 void timerDRR(int user)
 {
+    //printf("timerDRR\n");
     yield();
 }
 

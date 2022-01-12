@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "scheduler.h"
 
 uint64
 sys_exit(void)
@@ -108,11 +109,8 @@ sys_sched(void)
     argint(1,&factor);
     argint(2,&timeslice);
     argint(3,&ease);
-    printf("SCHED: %d %d %d %d\n",type,factor,timeslice,ease);
-    push_off();
-
-    pop_off();
-    return 53729;
+    //printf("SCHED: %d %d %d %d\n",type,factor,timeslice,ease);
+    return sched_change(type,factor,timeslice,ease);
 }
 
 uint64
@@ -125,5 +123,5 @@ sys_affinity(void)
     argint(1,&eager);
     argint(2,&age);
     printf("AFFINITY: %d %d %d\n",enabled,eager,age);
-    return 53730;
+    return sched_affinity(enabled,eager,age);
 }

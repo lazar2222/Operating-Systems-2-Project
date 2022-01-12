@@ -22,8 +22,8 @@ void perCoreInitializeCFS(int core)
 int getCFS()
 {
     int wticks;
-    if(heap[0]==0){return -1;}
-    int index= heap[1];
+    int index=heapMin();
+    if(index==-1){return -1;}
     heapRemove(1);
     wticks=ticks;
     proc[index].timeslice=(wticks-proc[index].schedtmp+(getprocnum()/2))/getprocnum();
@@ -31,11 +31,13 @@ int getCFS()
     //printf("TS %d %d %d\n",wticks-proc[index].schedtmp,getprocnum(),proc[index].timeslice);
     acquire(&(proc[index].lock));
     proc[index].state = RUNNING;
+    //printf("getCFS %d\n",mycpu()-cpus);
     return index;
 }
 
 void putCFS(int processIndex,int reason)
 {
+    //printf("putCFS\n");
     if(reason==REASON_AWAKENED)
     {
         proc[processIndex].executiontime=0;
@@ -49,6 +51,7 @@ void putCFS(int processIndex,int reason)
 
 void timerCFS(int user)
 {
+    //printf("timerCFS\n");
     struct proc* p=myproc();
     p->executiontime++;
     //printf("TIMER\n");

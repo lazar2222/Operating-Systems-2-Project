@@ -10,8 +10,8 @@
 #include "heap.h"
 
 int SJFtype=SCHEDULER_SJF_EAGER_PREEMPRIVE;
-int SJFtimeslice=1;
 int SJFfactor=64;
+int SJFtimeslice=1;
 int SJFease=1;
 
 void initializeSJF()
@@ -26,8 +26,8 @@ void perCoreInitializeSJF(int core)
 
 int getSJF()
 {
-    if(heap[0]==0){return -1;}
-    int index= heap[1];
+    int index=heapMin();
+    if(index==-1){return -1;}
     heapRemove(1);
     if(SJFtype==SCHEDULER_SJF)
     {
@@ -39,18 +39,19 @@ int getSJF()
     }
     acquire(&(proc[index].lock));
     proc[index].state = RUNNING;
+    //printf("getSJF\n");
     return index;
 }
 
 void putSJF(int processIndex,int reason)
 {
+    //printf("putSJF\n");
     if(reason==REASON_AWAKENED)
     {
         //printf("inserting with tau: %d %d %d\n",((proc[processIndex].schedtmp * (128 - SJFfactor)) + (proc[processIndex].executiontime * SJFfactor)+65)/128,proc[processIndex].schedtmp,proc[processIndex].executiontime);
         proc[processIndex].schedtmp = ((proc[processIndex].schedtmp * (128 - SJFfactor)) + (proc[processIndex].executiontime * SJFfactor)+65)/128;
         proc[processIndex].priority=proc[processIndex].schedtmp;
         proc[processIndex].executiontime=0;
-
     }
     else
     {
@@ -62,6 +63,7 @@ void putSJF(int processIndex,int reason)
 
 void timerSJF(int user)
 {
+    //printf("timerSJF\n");
     struct proc* p=myproc();
     p->executiontime++;
     if(p->timeslice>1)
@@ -73,10 +75,11 @@ void timerSJF(int user)
         //recheck scheduling calculate comparison priority "live tau"
         p->priority=(SJFtype==SCHEDULER_SJF_EAGER_PREEMPRIVE)?(((p->schedtmp*(128-SJFfactor))+(p->executiontime*SJFfactor)+65)/128)-SJFease:p->priority;
         acquire(&sched_lock);
-        if(proc[heap[1]].priority<p->priority)
+        int hmin=heapMin();
+        if(hmin!=-1 && proc[hmin].priority<p->priority)
         {
             release(&sched_lock);
-            //printf("PREMPT %d\n",p->pid);
+            //printf("PREMPT %d\n",SJFtype);
             yield();
         }
         else

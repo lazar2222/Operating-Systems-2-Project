@@ -120,7 +120,6 @@ struct proc {
 
 extern struct proc proc[NPROC];
 
-extern int numProc;
 extern int numCpus;
 extern struct spinlock numCpus_lock;
 
