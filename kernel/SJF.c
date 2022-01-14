@@ -49,23 +49,16 @@ int getSJF(int core)
     }
     acquire(&(proc[index].lock));
     proc[index].state = RUNNING;
-    //printf("getSJF\n");
     return index;
 }
 
 void putSJF(int processIndex,int reason)
 {
-    //printf("putSJF\n");
     if(reason==REASON_AWAKENED)
     {
-        //printf("inserting with tau: %d %d %d\n",((proc[processIndex].schedtmp * (128 - SJFfactor)) + (proc[processIndex].executiontime * SJFfactor)+65)/128,proc[processIndex].schedtmp,proc[processIndex].executiontime);
         proc[processIndex].schedtmp = ((proc[processIndex].schedtmp * (128 - SJFfactor)) + (proc[processIndex].executiontime * SJFfactor)+65)/128;
         proc[processIndex].priority=proc[processIndex].schedtmp;
         proc[processIndex].executiontime=0;
-    }
-    else
-    {
-        //printf("inserting with live tau: %d %d %d\n",proc[processIndex].priority,proc[processIndex].schedtmp,proc[processIndex].executiontime);
     }
     proc[processIndex].state=RUNNABLE;
     if(affinityEN!=AFFINITY_DISABLED)
@@ -80,7 +73,6 @@ void putSJF(int processIndex,int reason)
 
 void timerSJF(int user)
 {
-    //printf("timerSJF\n");
     struct proc* p=myproc();
     p->executiontime++;
     if(p->timeslice>1)
@@ -104,7 +96,6 @@ void timerSJF(int user)
         if(hmin!=-1 && proc[hmin].priority<p->priority)
         {
             release(&sched_lock);
-            //printf("PREMPT %d\n",SJFtype);
             yield();
         }
         else

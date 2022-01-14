@@ -59,12 +59,10 @@ int sched_get(int core)
         if((nrp&(1<<core))!=0)
         {
             runningProc++;
-            //printf("RUNNING: %d\n",runningProc);
         }
         else
         {
             runningProc--;
-            //printf("RUNNING: %d\n",runningProc);
         }
     }
     runningBitFlag=nrp;

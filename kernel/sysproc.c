@@ -109,7 +109,6 @@ sys_sched(void)
     argint(1,&factor);
     argint(2,&timeslice);
     argint(3,&ease);
-    //printf("SCHED: %d %d %d %d\n",type,factor,timeslice,ease);
     return sched_change(type,factor,timeslice,ease);
 }
 
@@ -122,6 +121,5 @@ sys_affinity(void)
     argint(0,&enabled);
     argint(1,&eager);
     argint(2,&age);
-    //printf("AFFINITY: %d %d %d\n",enabled,eager,age);
     return sched_affinity(enabled,eager,age);
 }

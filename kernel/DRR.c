@@ -26,7 +26,6 @@ int getDRR(int core)
         if(p->state == RUNNABLE) {
             acquire(&p->lock);
             p->state = RUNNING;
-            //printf("getDRR\n");
             return (p++)-proc;
         }
     }
@@ -36,13 +35,11 @@ int getDRR(int core)
 
 void putDRR(int processIndex,int reason)
 {
-    //printf("putDRR\n");
     proc[processIndex].state = RUNNABLE;
 }
 
 void timerDRR(int user)
 {
-    //printf("timerDRR\n");
     yield();
 }
 
