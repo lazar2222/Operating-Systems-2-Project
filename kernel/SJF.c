@@ -8,6 +8,7 @@
 #include "scheduler.h"
 #include "SJF.h"
 #include "heap.h"
+#include "affinityHeap.h"
 
 int SJFtype=SCHEDULER_SJF_EAGER_PREEMPRIVE;
 int SJFfactor=64;
@@ -24,11 +25,20 @@ void perCoreInitializeSJF(int core)
 
 }
 
-int getSJF()
+int getSJF(int core)
 {
-    int index=heapMin();
-    if(index==-1){return -1;}
-    heapRemove(1);
+    int index;
+    if(affinityEN!=AFFINITY_DISABLED)
+    {
+        index = AHget(core);
+        if (index == -1) { return -1; }
+    }
+    else
+    {
+        index = heapMin();
+        if (index == -1) { return -1; }
+        heapRemove(1);
+    }
     if(SJFtype==SCHEDULER_SJF)
     {
         proc[index].timeslice=0;
@@ -58,7 +68,14 @@ void putSJF(int processIndex,int reason)
         //printf("inserting with live tau: %d %d %d\n",proc[processIndex].priority,proc[processIndex].schedtmp,proc[processIndex].executiontime);
     }
     proc[processIndex].state=RUNNABLE;
-    heapInsert(processIndex);
+    if(affinityEN!=AFFINITY_DISABLED)
+    {
+        AHput(processIndex);
+    }
+    else
+    {
+        heapInsert(processIndex);
+    }
 }
 
 void timerSJF(int user)
@@ -75,7 +92,15 @@ void timerSJF(int user)
         //recheck scheduling calculate comparison priority "live tau"
         p->priority=(SJFtype==SCHEDULER_SJF_EAGER_PREEMPRIVE)?(((p->schedtmp*(128-SJFfactor))+(p->executiontime*SJFfactor)+65)/128)-SJFease:p->priority;
         acquire(&sched_lock);
-        int hmin=heapMin();
+        int hmin;
+        if(affinityEN!=AFFINITY_DISABLED)
+        {
+            hmin=AHmin(mycpu()-cpus);
+        }
+        else
+        {
+            hmin=heapMin();
+        }
         if(hmin!=-1 && proc[hmin].priority<p->priority)
         {
             release(&sched_lock);

@@ -122,6 +122,6 @@ sys_affinity(void)
     argint(0,&enabled);
     argint(1,&eager);
     argint(2,&age);
-    printf("AFFINITY: %d %d %d\n",enabled,eager,age);
+    //printf("AFFINITY: %d %d %d\n",enabled,eager,age);
     return sched_affinity(enabled,eager,age);
 }

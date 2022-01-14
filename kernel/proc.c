@@ -482,7 +482,7 @@ scheduler(void)
     intr_on();
 
     //Get next process
-    procIndex = sched_get();
+    procIndex = sched_get(c-cpus);
     if(procIndex!=-1) {
       p=&(proc[procIndex]);
       // Switch to chosen process.  It is the process's job

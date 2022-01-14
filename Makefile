@@ -30,6 +30,7 @@ OBJS = \
   $K/plic.o \
   $K/virtio_disk.o\
   $K/heap.o\
+  $K/affinityHeap.o\
   $K/SJF.o\
   $K/CFS.o\
   $K/DRR.o\

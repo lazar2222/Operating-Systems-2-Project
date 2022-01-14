@@ -66,7 +66,8 @@ main(int argc, char *argv[])
         }
     }
 
-    printf("proc_num=%d length=%d\n", proc_num, length);
+    int start=uptime();
+    printf("proc_num=%d length=%d start=%d\n", proc_num, length,start);
 
     for (int i = 0; i < proc_num; i++) {
         int pid = fork();
@@ -85,6 +86,8 @@ main(int argc, char *argv[])
     for (int i = 0; i < proc_num; i++) {
         wait(0);
     }
+    int end=uptime();
+    printf("TAKEN: %d end=%d\n",end-start,end);
 
     exit(0);
 }

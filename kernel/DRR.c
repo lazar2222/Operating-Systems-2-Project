@@ -19,7 +19,7 @@ void perCoreInitializeDRR(int core)
 
 }
 
-int getDRR()
+int getDRR(int core)
 {
     for(; p < &proc[NPROC]; p++) {
 

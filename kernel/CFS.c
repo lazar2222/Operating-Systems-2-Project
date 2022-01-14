@@ -8,6 +8,7 @@
 #include "scheduler.h"
 #include "CFS.h"
 #include "heap.h"
+#include "affinityHeap.h"
 
 void initializeCFS()
 {
@@ -19,12 +20,21 @@ void perCoreInitializeCFS(int core)
 
 }
 
-int getCFS()
+int getCFS(int core)
 {
     int wticks;
-    int index=heapMin();
-    if(index==-1){return -1;}
-    heapRemove(1);
+    int index;
+    if(affinityEN!=AFFINITY_DISABLED)
+    {
+        index = AHget(core);
+        if (index == -1) { return -1; }
+    }
+    else
+    {
+        index = heapMin();
+        if (index == -1) { return -1; }
+        heapRemove(1);
+    }
     wticks=ticks;
     proc[index].timeslice=(wticks-proc[index].schedtmp+(getprocnum()/2))/getprocnum();
     if(proc[index].timeslice==0){proc[index].timeslice=1;}
@@ -46,7 +56,14 @@ void putCFS(int processIndex,int reason)
     proc[processIndex].schedtmp = ticks;
     //printf("PUT %d %d\n",proc[processIndex].priority,proc[processIndex].schedtmp);
     proc[processIndex].state=RUNNABLE;
-    heapInsert(processIndex);
+    if(affinityEN!=AFFINITY_DISABLED)
+    {
+        AHput(processIndex);
+    }
+    else
+    {
+        heapInsert(processIndex);
+    }
 }
 
 void timerCFS(int user)

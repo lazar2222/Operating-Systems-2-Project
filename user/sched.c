@@ -13,7 +13,7 @@ main(int argc, char *argv[])
       printf("Preemptive Shortest Job First Scheduler: sched SJF_PRE factor timeslice\n");
       printf("Eager Preemptive Shortest Job First Scheduler: sched SJF_EAGER_PRE factor timeslice tolerance\n");
       printf("Completely Fair Scheduler: sched CFS\n");
-      printf("Setting affinity parameters: sched AFFINITY_ENABLED|AFFINITY_DISABLED initialLaziness maxAge\n");
+      printf("Setting affinity parameters: sched AFFINITY_ENABLED_AGING|AFFINITY_ENABLED|AFFINITY_DISABLED initialLaziness maxAge\n");
       printf("Parameters are positional, value of -1 indicates no change\n");
     exit(1);
   }
@@ -79,6 +79,15 @@ main(int argc, char *argv[])
           exit(1);
       }
       ret = sched(SCHEDULER_CFS,values[0],values[1],values[2]);
+  }
+  else if(strcmp(argv[1],"AFFINITY_ENABLED_AGING")==0)
+  {
+      if(argc>4)
+      {
+          printf("sched: too many arguments\n");
+          exit(1);
+      }
+      ret = affinity(AFFINITY_ENABLED_AGING,values[0],values[1]);
   }
   else if(strcmp(argv[1],"AFFINITY_ENABLED")==0)
   {

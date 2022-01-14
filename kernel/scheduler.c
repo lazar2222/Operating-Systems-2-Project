@@ -10,10 +10,15 @@
 #include "CFS.h"
 #include "DRR.h"
 #include "heap.h"
+#include "affinityHeap.h"
 
 struct schedulingStrategy* currentSchedulingStrategy;
 
 struct spinlock sched_lock;
+
+int runningProc=0;
+int runningBitFlag=0;
+int affinityEN;
 
 void sched_initialize()
 {
@@ -22,8 +27,11 @@ void sched_initialize()
     SJFfactor=64;
     SJFtimeslice=1;
     SJFease=1;
-    //TODO: set default affinity parameters
+    affinityEN=AFFINITY_ENABLED_AGING;
+    AHinitialLaziness=2;
+    AHmaxAge=2;
     initlock(&sched_lock,"sched_lock");
+    AHinit();
     currentSchedulingStrategy->initialize();
 }
 
@@ -32,11 +40,34 @@ void sched_perCoreInitialize(int core)
     currentSchedulingStrategy->perCoreInitialize(core);
 }
 
-int sched_get()
+int sched_get(int core)
 {
     int val;
     acquire(&sched_lock);
-    val=currentSchedulingStrategy->get();
+    val=currentSchedulingStrategy->get(core);
+    int nrp=runningBitFlag;
+    if(val==-1)
+    {
+        nrp&=~(1<<core);
+    }
+    else
+    {
+        nrp|=(1<<core);
+    }
+    if(nrp!=runningBitFlag)
+    {
+        if((nrp&(1<<core))!=0)
+        {
+            runningProc++;
+            //printf("RUNNING: %d\n",runningProc);
+        }
+        else
+        {
+            runningProc--;
+            //printf("RUNNING: %d\n",runningProc);
+        }
+    }
+    runningBitFlag=nrp;
     release(&sched_lock);
     return val;
 }
@@ -103,13 +134,27 @@ int sched_change(int type,int factor,int timeslice,int ease)
             for (int i = 0; i < NPROC; ++i) {
                 if(proc[i].state==RUNNABLE)
                 {
-                    heapInsert(i);
+                    if(affinityEN!=AFFINITY_DISABLED)
+                    {
+                        AHput(i);
+                    }
+                    else
+                    {
+                        heapInsert(i);
+                    }
                 }
             }
         }
         if(newSS==&DRRscheduler)
         {
-            heapClear();
+            if(affinityEN!=AFFINITY_DISABLED)
+            {
+                AHclear();
+            }
+            else
+            {
+                heapClear();
+            }
             newSS->initialize();
         }
 
@@ -124,5 +169,55 @@ int sched_change(int type,int factor,int timeslice,int ease)
 
 int sched_affinity(int enabled,int initialLaziness, int maxAge)
 {
+    if(enabled!=AFFINITY_DISABLED && enabled!=AFFINITY_ENABLED && enabled!=AFFINITY_ENABLED_AGING)
+    {
+        return -1; //Unknown affinity strategy
+    }
+    if(initialLaziness !=-1 && initialLaziness<0){return -2;}
+    if(maxAge!=-1 && (maxAge<1 || maxAge>=NPROC)){return -2;}
+
+    //I cant be bothered to check for cases so lets always do a full reset
+    acquire(&sched_lock);   //Prevent scheduling while changing schedulers
+                            //and since acquire disables interrupts it also prevents timer from being fired
+
+    //Reset internal data structures
+    AHinit();
+    for (int i = 0; i < NPROC; ++i) {
+        proc[i].affinity=-1;
+        proc[i].affinityAge=0;
+        proc[i].laziness=0;
+    }
+
+    //Migrate heaps
+    if(affinityEN!=enabled)
+    {
+        if(affinityEN==AFFINITY_DISABLED)
+        {
+            heapClear();
+            for (int i = 0; i < NPROC; ++i) {
+                if(proc[i].state==RUNNABLE)
+                {
+                    AHput(i);
+                }
+            }
+        }
+        if(enabled==AFFINITY_DISABLED)
+        {
+            AHclear();
+            for (int i = 0; i < NPROC; ++i) {
+                if(proc[i].state==RUNNABLE)
+                {
+                    heapInsert(i);
+                }
+            }
+        }
+    }
+
+    //Update parameters
+    affinityEN=enabled;
+    if(initialLaziness!=-1){AHinitialLaziness=initialLaziness;}
+    if(maxAge!=-1){AHmaxAge=maxAge;}
+
+    release(&sched_lock);
     return 0;
 }
